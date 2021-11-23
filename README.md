@@ -43,13 +43,31 @@ chdir("/tmp")
     `echo '123' >/proc/2824/fd/4`
 
 ## 4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
+Зомби-процессы не занимают памяти (как процессы-сироты), но блокируют записи в таблице процессов.
+
 ## 5. В iovisor BCC есть утилита `opensnoop`:
     ```bash
     root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
     /usr/sbin/opensnoop-bpfcc
     ```
     На какие файлы вы увидели вызовы группы `open` за первую секунду работы утилиты? Воспользуйтесь пакетом `bpfcc-tools` для Ubuntu 20.04. Дополнительные [сведения по установке](https://github.com/iovisor/bcc/blob/master/INSTALL.md).
+    
+    `vagrant@vagrant:~$ dpkg -L bpfcc-tools | grep sbin/opensnoop
+    /usr/sbin/opensnoop-bpfcc
+    vagrant@vagrant:~$ sudo /usr/sbin/opensnoop-bpfcc
+    PID    COMM               FD ERR PATH
+    784    vminfo              4   0 /var/run/utmp
+    567    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
+    567    dbus-daemon        18   0 /usr/share/dbus-1/system-services
+    567    dbus-daemon        -1   2 /lib/dbus-1/system-services
+    567    dbus-daemon        18   0 /var/lib/snapd/dbus-1/system-services/
+    ^Cvagrant@vagrant:~$`
+
 ## 6. Какой системный вызов использует `uname -a`? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в `/proc`, где можно узнать версию ядра и релиз ОС.
+Системный вызов `uname()`
+
+Цитата `Part of the utsname information is also accessible via /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}.`
+
 ## 7. Чем отличается последовательность команд через `;` и через `&&` в bash? Например:
     ```bash
     root@netology1:~# test -d /tmp/some_dir; echo Hi
